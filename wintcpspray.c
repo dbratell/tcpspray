@@ -2,6 +2,10 @@
  *
  * Daniel Bratell
  *
+ * v1.2 1998 2 May
+ *    Sends a random stream of bytes instead of only
+ *    zeros.
+ *
  * v1.1 1998 7 April
  *    Made the program handle breaks (CTRL-C) in a
  *    nicer way buy printing the info gathered so far.
@@ -21,9 +25,10 @@
 
 #include <WINSOCK.H>
 #include <stdio.h>
+#include <time.h>
 #include <windows.h>
 
-#define VERSIONSTRING "TCPSpray for Windows version 1.1"
+#define VERSIONSTRING "TCPSpray for Windows version 1.2"
 #define	COPYRIGHTSTRING "(c) 1997,1998 Daniel Bratell (bratell@lysator.liu.se)"
 
 #define DEFBLKSIZE 1024		/* default  blocksize is 1k */
@@ -56,6 +61,7 @@ int main(int argc, char *argv[])
 	
 	/* generic counter */
 	int cnt;
+	unsigned int i;
 
 	WSADATA wsaData;
 
@@ -76,8 +82,8 @@ int main(int argc, char *argv[])
 
 	/* Set handler for ctrl-C. */
 	fSuccess = SetConsoleCtrlHandler( 
-    (PHANDLER_ROUTINE) breakhandler,  /* handler function */ 
-    TRUE);                           /* add to list      */ 
+	    (PHANDLER_ROUTINE) breakhandler,  /* handler function */ 
+		TRUE);                           /* add to list      */ 
 	if (! fSuccess) {
 		/* Too bad. But since things work anyway, I don't
 		 * really care.
@@ -142,13 +148,24 @@ int main(int argc, char *argv[])
 		printf("Sending %d bytes with blocksize %d bytes\n",
 		nbytes, blksize); 
 
-	if ((buf =  malloc((blksize < 4096) ? 4096 : blksize)) == NULL) {
+	if ((buf =  malloc(blksize)) == NULL) {
 		perror("malloc buf");
 		WSACleanup();
 		exit(1);
 	}
-
-	memset(buf, (char) 0, blksize);		/* clean out the buffer */
+		/* clean out the buffer */
+/*	memset(buf, (char) 0, blksize);
+*/
+	
+	/* Fill the buffer with random data. */
+	/* Could be done more efficient by setting
+	 * bigger blocks than one byte at a time to
+	 * a random value. 
+     */
+	srand((unsigned)time(NULL));
+	for(i = 0; i<blksize; i++) {
+		buf[i] = rand();
+	}
 	
 	start = GetTickCount();
 
