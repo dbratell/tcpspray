@@ -1,0 +1,77 @@
+.\" manual page v0.3 [1/15/92] for tcpspray
+.TH TCPSPRAY 1 "23 October 1991"
+.SH NAME
+tcpspray \- print average throughput for a tcp connection
+.SH SYNOPSIS
+.B tcpspray
+[
+.B \-v
+] [
+.B \-e
+] [
+.B \-h
+] [
+.B \-b
+.I blksize
+] [
+.B \-n
+.I nblks
+]
+.if n .ti +5n
+[
+.B \-f
+.I filename
+]
+.I hostname
+.SH DESCRIPTION
+.LP
+.I tcpspray
+sends data to either the discard or echo TCP service on the specified
+host and prints the average throughput.
+.SH OPTIONS
+.TP 15
+.BI \-v
+Prints a dot for each block sent. Will also print a backspace for each
+block received in echo mode.  Note: the I/O required for this option will
+affect the throughput rates.
+.TP
+.BI \-e
+Use the TCP echo service instead of discard (the default) and print
+throughput rates for both transmission and reception.
+.TP
+.BI \-h
+Print a usage description.
+.TP
+.BI \-b " blksize"
+Sets the size of a block (the internal buffer) in bytes.  Defaults to 1024.
+.TP
+.BI \-n " nblks"
+Sets the number of blocks to transfer.  Defaults to 100.
+.TP
+.BI \-f " filename"
+Copy the contents of the specified file into the internal buffer
+(sized by
+.BI \-b
+option).  The buffer is zeroed by default.  If the file is larger than
+the buffer, only the first
+.I blksize
+bytes will be used.  If the file is smaller than the buffer, the
+remaining bytes are zeroed. 
+
+This option is useful in determining the relationship of the data
+transferred to throughput.  E.g., if data compression is used on any
+of the intermediate links comprising the TCP connection, preloading
+the buffer with a text file will produce greater throughput than with
+a file that has already been compressed.
+.TP
+.BI \-d " delay"
+Sets the time in microseconds to wait between successive buffer
+transmissions.  The default is no delay.
+.TP
+\".SH EXAMPLES
+\".SH FILES
+.SH SEE ALSO
+.BR ping (8),
+.BR spray (8)
+.SH AUTHOR
+Greg Christy (gmc@quotron.com)
